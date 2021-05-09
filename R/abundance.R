@@ -16,15 +16,20 @@
 #' @return A numeric value for the abundance, expressed a parts per million (ppm), of the requested protein.
 #' @author Juan Carlos Aledo
 #' @examples abundance(id = 'A0AVT1')
-#' abundance(id = 'A0AVT1', 'jurkat')
-#' abundance(id = 'A0AVT1', 'hela')
+#' @examples \dontrun{abundance(id = 'A0AVT1', 'jurkat')}
+#' @examples \dontrun{abundance(id = 'A0AVT1', 'hela')}
 #' @references Wang et al. Proteomics 2015, 10.1002/pmic.201400441. (PMID: 25656970)
 #' @export
 
 abundance <- function(id, ...){
 
   tissue <- list(...)
+
   sp <- species.mapping(id)
+  if (is.null(sp)){
+    message("Sorry, data abundance for the requested protein could not be found")
+    return(NULL)
+  }
 
   if (sp == 'Arabidopsis thaliana'){
     paxdb <- pax.ath
@@ -61,9 +66,9 @@ abundance <- function(id, ...){
   } else if (sp == 'Sus scrofa'){
     paxdb <- pax.ssc
   } else {
-    warning <- paste('Abundance data for proteins of the species ',
-                     sp, " couldn't be found", sep = "")
-    return(warning)
+    message(paste('Abundance data for proteins of the species ',
+                     sp, " couldn't be found", sep = ""))
+    return(NULL)
   }
 
   paxdb$abundance <- as.numeric(as.character(paxdb$abundance))

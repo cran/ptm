@@ -28,7 +28,6 @@ The distance between the delta sulfur atom and the centroid of the aromatic ring
 }
 \examples{
 \dontrun{saro.geometry('1CLL', rA = 141, rB = 145)}
-\dontrun{saro.geometry(pdb = '1d0g', rA = 99, chainA = 'R', rB = 237, chainB = 'A')}
 }
 \references{
 Reid, Lindley & Thornton, FEBS Lett. 1985, 190, 209-213.

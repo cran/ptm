@@ -19,7 +19,7 @@
 #' @details For each methionyl residue this function computes the distances to the closest aromatic ring from Y, F and W. When that distance is equal or lower to the threshold, it will be computed as a S-aromatic motif.
 #' @return The function returns a dataframe with as many rows as methionyl residues are found in the protein. The distances in ångströms to the closest tyrosine, phenylalanine and triptophan are given in the columns, as well as the number of S-aromatic motifs detected with each of these amino acids. Also a raw distance matrix can be provided.
 #' @author Juan Carlos Aledo
-#' @examples saro.dist('1CLL')
+#' @examples \dontrun{saro.dist('1CLL')}
 #' @references Reid, Lindley & Thornton, FEBS Lett. 1985, 190:209-213.
 #' @seealso saro.motif(), saro.geometry()
 #' @importFrom bio3d read.pdb
@@ -28,7 +28,20 @@
 saro.dist <- function(pdb, threshold = 7, rawdata = FALSE){
 
   ## ---------- Getting pdb & Checking for M, Y, F and W ----------- ##
-  x <- suppressWarnings(bio3d::read.pdb(pdb, verbose = FALSE)) # avoids warning: Skipping download
+  x <- tryCatch(
+    {
+      suppressWarnings(bio3d::read.pdb(pdb, verbose = FALSE))
+    },
+    error = function(cond){
+      return(-999)
+    }
+  )
+
+  if (is.numeric(x)){
+    message("Sorry, read.pdb failed")
+    return(NULL)
+  }
+
   x <- x$atom
   is_there_M <- TRUE %in% (x$resid == "MET")
   is_there_Y <- TRUE %in% (x$resid == "TYR")
@@ -293,7 +306,6 @@ saro.dist <- function(pdb, threshold = 7, rawdata = FALSE){
 #' @return The function returns a dataframe providing the coordinates of the sulfur atom and the centroid (centroids when the aromatic residue is tryptophan), as well as the distance (ångströms) and the angle (degrees) mentioned above.
 #' @author Juan Carlos Aledo
 #' @examples \dontrun{saro.geometry('1CLL', rA = 141, rB = 145)}
-#' @examples \dontrun{saro.geometry(pdb = '1d0g', rA = 99, chainA = 'R', rB = 237, chainB = 'A')}
 #' @references Reid, Lindley & Thornton, FEBS Lett. 1985, 190, 209-213.
 #' @seealso saro.motif(), saro.dist()
 #' @importFrom bio3d read.pdb
@@ -303,7 +315,21 @@ saro.geometry <- function(pdb, rA, chainA = 'A', rB, chainB = 'A'){
 
   ## -------------------- Reading the pdb file ---------------------- ##
   temp <- tempfile()
-  x <- suppressWarnings(bio3d::read.pdb(pdb, verbose = FALSE)) # avoids warnings: 'pdb exists. Skipping download'
+
+  x <- tryCatch(
+    {
+      suppressWarnings(bio3d::read.pdb(pdb, verbose = FALSE))
+    },
+    error = function(cond){
+      return(-999)
+    }
+  )
+
+  if (is.numeric(x)){
+    message("Sorry, read.pdb failed")
+    return(NULL)
+  }
+
   x <- x$atom
   xA <- x[which(x$resno == rA & x$chain == chainA),]
   xB <- x[which(x$resno == rB & x$chain == chainB),]
@@ -445,7 +471,17 @@ saro.motif <- function(pdb, threshold = 7, onlySaro = TRUE){
   # Test with a pdb for a protein lacking either Met or aromatic residues
 
   ## -------------- Getting raw distance matrix ------------- ##
-  d <- saro.dist(pdb, threshold, rawdata = TRUE)[[2]]
+  d <- saro.dist(pdb, threshold, rawdata = TRUE)
+
+  if (!is.list(d)){
+    if (is.null(d)){
+      message("Sorry, saro.dist failed")
+      return(NULL)
+    }
+  } else {
+    d <- d[[2]]
+  }
+
   d[,1] <- as.character(d[,1])
 
   ## -------------- Output dataframe ------------------------ ##
