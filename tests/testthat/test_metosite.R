@@ -36,6 +36,7 @@ test_that('meto.scan() works properly', {
 
   m1 <- meto.scan('P01009')
   m2 <- meto.scan('P01009', report = 2)
+  m3 <- meto.scan('P01009', report = 3)
 
   if (!is.null(m1)){
     expect_is(m1, "list")
@@ -48,8 +49,15 @@ test_that('meto.scan() works properly', {
     expect_length(m2, 18)
     expect_equal(dim(m1$Metosites), c(3,7))
   }
-})
 
+  if (!is.null(m3)){
+    expect_is(m2, "list")
+    expect_length(m3, 2)
+    expect_equal(dim(m3$Metosites), c(3,7))
+    expect_true(file.exists('report_scan_P01009.txt'))
+  }
+})
+file.remove('report_scan_P01009.txt')
 
 
 ## ---------------------------------------------- ##

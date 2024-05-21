@@ -9,7 +9,7 @@ meto.scan(up_id, report = 1)
 \arguments{
 \item{up_id}{a character string corresponding to the UniProt ID.}
 
-\item{report}{it should be eithre 1 or 2.}
+\item{report}{it should be a natural number between 1 and 3.}
 }
 \value{
 This function returns a report regarding the MetO sites found, if any, in the protein of interest.
@@ -18,7 +18,7 @@ This function returns a report regarding the MetO sites found, if any, in the pr
 Scans a given protein in search of MetO sites.
 }
 \details{
-When the 'report' parameter has been set to 1, this function returns a brief report providing the position,  the function category and literature references concerning the residues detected as MetO, if any. If we wish to obtain a more detailed report, the option should be: report = 2.
+When the 'report' parameter has been set to 1, this function returns a brief report providing the position,  the function category and literature references concerning the residues detected as MetO, if any. If we wish to obtain a more detailed report, the option should be: report = 2. Finally, If we want a detailed and printable report (saved in the current directory), we should set report = 3
 }
 \examples{
 meto.scan('P01009')

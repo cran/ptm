@@ -106,8 +106,8 @@ meto.search <-  function(highthroughput.group = TRUE,
 #' @description Scans a given protein in search of MetO sites.
 #' @usage meto.scan(up_id, report = 1)
 #' @param up_id a character string corresponding to the UniProt ID.
-#' @param report it should be eithre 1 or 2.
-#' @details When the 'report' parameter has been set to 1, this function returns a brief report providing the position,  the function category and literature references concerning the residues detected as MetO, if any. If we wish to obtain a more detailed report, the option should be: report = 2.
+#' @param report it should be a natural number between 1 and 3.
+#' @details When the 'report' parameter has been set to 1, this function returns a brief report providing the position,  the function category and literature references concerning the residues detected as MetO, if any. If we wish to obtain a more detailed report, the option should be: report = 2. Finally, If we want a detailed and printable report (saved in the current directory), we should set report = 3
 #' @return This function returns a report regarding the MetO sites found, if any, in the protein of interest.
 #' @author Juan Carlos Aledo
 #' @examples meto.scan('P01009')
@@ -138,6 +138,74 @@ meto.scan <- function(up_id, report = 1){
 
     long_output <- output
     return(long_output)
+
+  } else if (report == 3){
+
+    if (requireNamespace("markdown", quietly = TRUE)){
+      markobj <- c('---',
+                   'title: "Scan Report"',
+                   'output: word_document',
+                   '---',
+                   '',
+                   '```{r, out.width = "50px", fig.align="left", echo = FALSE}',
+                   'knitr::include_graphics("/Users/JCA/Dropbox/Investigacion/R_ptm/metosite_logo.png")',
+                   '```',
+                   '',
+                   '# Scan Report',
+                   '```{r, echo = FALSE}',
+                   'cat(paste("Protein name:  ", output$prot_name, sep = ""))',
+                   'cat(paste("UniProt ID:  ", output$prot_id, sep = ""))',
+                   'cat(paste("Nickname:  ", output$prot_nickname, sep = ""))',
+                   'cat(paste("Gene name:  ", output$gene_name, sep = ""))',
+                   'cat(paste("Species:  ", output$prot_sp, sep = ""))',
+                   'cat(paste("Protein location:  ", output$prot_sub, sep = ""))',
+                   'cat(paste("PDB ID:  ", output$prot_pdb, sep = ""))',
+                   '```',
+
+                   '```{r, echo = FALSE}',
+                   'cat(paste("Protein sequence:  ", output$prot_seq, sep =""))',
+                   'cat(paste("Note:  ", output$prot_note, sep = ""))',
+                   '```',
+
+                   '```{r, echo = FALSE}',
+                   'cat(" ------------------ MetO sites found in this protein ----------------- ##")',
+                   'print(output$Metosites)',
+                   'cat(" --------------------------------------------------------------------- ##")',
+                   '```',
+                   '',
+                   '',
+                   '```{r, echo = FALSE}',
+                   'cat("Phosphorylation:")',
+                   'print(output$Phosphorylation)',
+                   'cat("Acetylation:")',
+                   'print(output$Acetylation)',
+                   'cat("Methylation")',
+                   'print(output$Methylation)',
+                   'cat("Ubiquitination")',
+                   'print(output$Ubiquitination)',
+                   'cat("Sumoylation")',
+                   'print(output$Sumoylation)',
+                   'cat("OGlcNAc")',
+                   'print(output$OGlcNAc)',
+                   'cat("RegPTM")',
+                   'print(output$RegPTM)',
+                   'cat("Disease")',
+                   'print(output$Disease)',
+                   '```'
+      )
+
+      destfile <- paste('report_scan_', up_id, '.txt', sep = "")
+      markdown::markdownToHTML(text = knitr::knit(text = markobj), output = destfile)
+      # markdown::markdownToHTML(text = knitr::knit(text = markobj), output ='report.html')
+      # browseURL("report.html")
+    } else {
+      warning("To get a full printable report you should install the package 'markdown'")
+    }
+
+    brief_output <- list()
+    brief_output$Metosites <- output$Metosites
+    brief_output$Note <- output$prot_note
+    return(brief_output)
 
   } else {
     stop("A proper report's mode should be provided")
